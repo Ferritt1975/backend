@@ -29,12 +29,26 @@
 ```
 
 ## /list/{id}/DELETE
+```javascript
+#set($allParams = $input.params())
+{
+    "operation": "deleteListObjectById",
+    "tableName": "lists",
+    "payload" : {
+        #set($params = $allParams.get('path'))
+        #foreach($paramName in $params.keySet())
+        "$paramName" : $util.escapeJavaScript($params.get($paramName))
+        #if($foreach.hasNext),#end
+        #end
+    }
+}
+```
 
 ## /list/{id}/GET
 ```javascript
 #set($allParams = $input.params())
 {
-    "operation": "getListById",
+    "operation": "getListObjectById",
     "tableName": "lists",
     "payload" : {
         #set($params = $allParams.get('path'))
