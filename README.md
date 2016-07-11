@@ -103,7 +103,7 @@
 ```javascript
 #set($allParams = $input.params())
 {
-    "operation": "getTaskObjectHavingParentId",
+    "operation": "getTaskObjectsHavingParentId",
     "payload" : {
         #set($params = $allParams.get('path'))
         #foreach($paramName in $params.keySet())
