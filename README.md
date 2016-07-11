@@ -14,7 +14,6 @@
 #set($allParams = $input.params())
 {
     "operation": "putListObject",
-    "tableName": "lists",
     "payload" : $input.json('$')
 }
 ```
@@ -23,8 +22,7 @@
 ```javascript
 #set($allParams = $input.params())
 {
-    "operation": "getLists",
-    "tableName": "lists"
+    "operation": "getLists"
 }
 ```
 
@@ -33,7 +31,6 @@
 #set($allParams = $input.params())
 {
     "operation": "deleteListObjectById",
-    "tableName": "lists",
     "payload" : {
         #set($params = $allParams.get('path'))
         #foreach($paramName in $params.keySet())
@@ -49,7 +46,6 @@
 #set($allParams = $input.params())
 {
     "operation": "updateListObjectById",
-    "tableName": "lists",
     "payload" : $input.json('$'),
         #set($params = $allParams.get('path'))
         #foreach($paramName in $params.keySet())
@@ -64,7 +60,6 @@
 #set($allParams = $input.params())
 {
     "operation": "getListObjectById",
-    "tableName": "lists",
     "payload" : {
         #set($params = $allParams.get('path'))
         #foreach($paramName in $params.keySet())
@@ -80,7 +75,6 @@
 #set($allParams = $input.params())
 {
     "operation": "putTaskObject",
-    "tableName": "tasks",
     "payload" : {
         #set($params = $allParams.get('path'))
         #foreach($paramName in $params.keySet())
@@ -95,7 +89,6 @@
 #set($allParams = $input.params())
 {
     "operation": "deleteTasksHavingParentId",
-    "tableName": "tasks",
     "payload" : {
         #set($params = $allParams.get('path'))
         #foreach($paramName in $params.keySet())
@@ -111,7 +104,6 @@
 #set($allParams = $input.params())
 {
     "operation": "getTaskObjectHavingParentId",
-    "tableName": "lists",
     "payload" : {
         #set($params = $allParams.get('path'))
         #foreach($paramName in $params.keySet())
@@ -127,7 +119,6 @@
 #set($allParams = $input.params())
 {
     "operation": "deleteTaskObjectById",
-    "tableName": "lists",
     "payload" : {
         #set($params = $allParams.get('path'))
         #foreach($paramName in $params.keySet())
@@ -143,7 +134,6 @@
 #set($allParams = $input.params())
 {
     "operation": "updateTaskObjectById",
-    "tableName": "lists",
     "payload" : $input.json('$'),
         #set($params = $allParams.get('path'))
         #foreach($paramName in $params.keySet())
@@ -158,7 +148,6 @@
 #set($allParams = $input.params())
 {
     "operation": "getTaskObjectById",
-    "tableName": "lists",
     "payload" : {
         #set($params = $allParams.get('path'))
         #foreach($paramName in $params.keySet())
