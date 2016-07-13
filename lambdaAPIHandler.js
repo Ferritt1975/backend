@@ -3,28 +3,25 @@ console.log('Loading function');
 
 let doc = require('dynamodb-doc');
 let dynamo = new doc.DynamoDB();
-var taskTable = 'tasks';
-var listTable = 'lists';
 
+/**
+ * Provide an event that contains the following keys:
+ *
+ *   - operation: one of the operations in the switch statement below
+ *   - tableName: required for operations that interact with DynamoDB
+ *   - payload: a parameter to pass to the operation being performed
+ */
 exports.handler = (event, context, callback) => {
+    //console.log('Received event:', JSON.stringify(event, null, 2));
 
-    var datetime = new Date().getTime().toString();
-    var operation = event.operation;
-    var payload;
-    if (event.payload) {
-        payload = JSON.parse(JSON.stringify(event.payload));
-    }
+    if (event.tableName)
+        event.payload.TableName = event.tableName;
+
+    const operation = event.operation;
 
     switch (operation) {
-        case 'putListObject':
-            dynamo.putItem({
-                TableName: listTable,
-                Item: {
-                    id: Number(datetime),
-                    name: payload.name,
-                    note: payload.note
-                }
-            }, function(err, data) {
+        case 'create':
+            dynamo.putItem(event.payload, function(err, data) {
                 if (err) {
                     context.fail('ERROR: Dynamo failed: ' + err);
                 } else {
@@ -33,58 +30,19 @@ exports.handler = (event, context, callback) => {
                 }
             });
             break;
-        case 'getLists':
-            dynamo.scan({
-                TableName : listTable
-            }, function(err, data) {
+        case 'read':
+            dynamo.scan(event.payload, function(err, data) {
                 if (err) {
-                    context.done('error','reading dynamodb failed: '+err);
-                }
-                context.done(null, data.Items);
-            });
-            break;
-        case 'deleteListObjectById':
-            dynamo.deleteItem({
-                TableName: listTable,
-                Key: {
-                    id: payload.id
-                }
-            }, function(err, data) {
-                if (err) {
-                    context.fail('ERROR: DELETE operation failed: ' + err);
+                    context.fail('ERROR: Dynamo failed: ' + err);
                 } else {
-                    console.log('DELETE operation succeded.');
-                    context.succeed('SUCCESS');
+                    console.log('Dynamo Success: ' + JSON.stringify(data, null, '  '));
+                    context.succeed(data);
                 }
             });
             break;
-        case 'updateListObjectById':
-            //TODO
-            break;
-        case 'getListObjectById':
-            dynamo.scan({
-                TableName : listTable,
-                FilterExpression: "id = :value",
-                ExpressionAttributeValues: {
-                    ":value": payload.id
-                }
-            }, function(err, data) {
-                if (err) {
-                    context.done('error','reading dynamodb failed: '+err);
-                }
-                callback(null, data.Items);
-            });
-            break;
-        case 'putTaskObject':
-            dynamo.putItem({
-                TableName: taskTable,
-                Item: {
-                    id: Number(datetime),
-                    name: payload.name,
-                    note: payload.note,
-                    complete: payload.complete
-                }
-            }, function(err, data) {
+        case 'update':
+            event.payload.Item.version += 1;
+            dynamo.putItem(event.payload, function(err, data) {
                 if (err) {
                     context.fail('ERROR: Dynamo failed: ' + err);
                 } else {
@@ -93,54 +51,24 @@ exports.handler = (event, context, callback) => {
                 }
             });
             break;
-        case 'deleteTasksHavingParentId':
-            //TODO
-            break;
-        case 'getTaskObjectsHavingParentId':
-                dynamo.scan({
-                TableName : taskTable,
-                FilterExpression: "parent = :value",
-                ExpressionAttributeValues: {
-                    ":value": payload.id
-                }
-            }, function(err, data) {
+        case 'delete':
+            dynamo.deleteItem(event.payload, function(err, data) {
                 if (err) {
-                    context.done('error','reading dynamodb failed: '+err);
-                }
-                callback(null, data.Items);
-            });
-            break;
-        case 'deleteTaskObjectById':
-            dynamo.deleteItem({
-                TableName: taskTable,
-                Key: {
-                    id: payload.id
-                }
-            }, function(err, data) {
-                if (err) {
-                    context.fail('ERROR: DELETE operation failed: ' + err);
+                    context.fail('ERROR: Dynamo failed: ' + err);
                 } else {
-                    console.log('DELETE operation succeded.');
+                    console.log('Dynamo Success: ' + JSON.stringify(data, null, '  '));
                     context.succeed('SUCCESS');
                 }
             });
             break;
-        case 'updateTaskObjectById':
-            //TODO
+        case 'list':
+            dynamo.scan(event.payload, callback);
             break;
-        case 'getTaskObjectById':
-                dynamo.scan({
-                TableName : taskTable,
-                FilterExpression: "id = :value",
-                ExpressionAttributeValues: {
-                    ":value": payload.id
-                }
-            }, function(err, data) {
-                if (err) {
-                    context.done('error','reading dynamodb failed: '+err);
-                }
-                callback(null, data.Items);
-            });
+        case 'echo':
+            callback(null, event.payload);
+            break;
+        case 'ping':
+            callback(null, 'pong');
             break;
         default:
             callback(new Error(`Unrecognized operation "${operation}"`));
