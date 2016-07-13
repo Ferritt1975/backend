@@ -9,151 +9,82 @@
 
 # API Gateway Body Mapping Templates
 
-## /list/POST
+## /todo/GET
 ```javascript
 #set($allParams = $input.params())
 {
-    "operation": "putListObject",
+    "tableName": "todo",
+    "operation": "read",
+    "payload" : {}
+}
+```
+
+## /todo/{id}/GET
+```javascript
+#set($allParams = $input.params())
+{
+    "tableName": "todo",
+    "operation": "read",
+    "payload" : {
+        "FilterExpression": "#s = :value",
+        "ExpressionAttributeNames": { "#s": "self" },
+        "ExpressionAttributeValues": { ":value": 
+        #set($params = $allParams.get('path'))
+        #foreach($paramName in $params.keySet())
+        "$util.escapeJavaScript($params.get($paramName))"
+        #if($foreach.hasNext),#end
+        #end
+        }
+    }
+}
+```
+
+## /todo/POST
+```javascript
+#set($allParams = $input.params())
+{
+    "tableName": "todo",
+    "operation": "create",
     "payload" : $input.json('$')
 }
 ```
 
-## /list/GET
+## /todo/{id}/PUT
 ```javascript
 #set($allParams = $input.params())
 {
-    "operation": "getLists"
-}
-```
-
-## /list/{id}/DELETE
-```javascript
-#set($allParams = $input.params())
-{
-    "operation": "deleteListObjectById",
+    "tableName": "todo",
+    "operation": "update",
     "payload" : {
+        "Item": $input.json('$'),
+        "ExpressionAttributeNames": { "#s": "self" },
+        "ExpressionAttributeValues": {
         #set($params = $allParams.get('path'))
         #foreach($paramName in $params.keySet())
-        "$paramName" : $util.escapeJavaScript($params.get($paramName))
+        ":id" : "$util.escapeJavaScript($params.get($paramName))"
         #if($foreach.hasNext),#end
-        #end
+        #end,
+        ":version" : $input.json('$.version')
+        },
+        "ConditionExpression": "#s <= :id AND version <= :version"
     }
 }
 ```
 
-## /list/{id}/POST
+## /todo/{id}DELETE
 ```javascript
 #set($allParams = $input.params())
 {
-    "operation": "updateListObjectById",
-    "payload" : $input.json('$'),
-        #set($params = $allParams.get('path'))
-        #foreach($paramName in $params.keySet())
-        "$paramName" : $util.escapeJavaScript($params.get($paramName))
-        #if($foreach.hasNext),#end
-        #end
-}
-```
-
-## /list/{id}/GET
-```javascript
-#set($allParams = $input.params())
-{
-    "operation": "getListObjectById",
+    "tableName": "todo",
+    "operation": "delete",
     "payload" : {
-        #set($params = $allParams.get('path'))
-        #foreach($paramName in $params.keySet())
-        "$paramName" : $util.escapeJavaScript($params.get($paramName))
-        #if($foreach.hasNext),#end
-        #end
-    }
-}
-```
-
-## /task/POST
-```javascript
-#set($allParams = $input.params())
-{
-    "operation": "putTaskObject",
-    "payload" : {
-        #set($params = $allParams.get('path'))
-        #foreach($paramName in $params.keySet())
-        "$paramName" : $util.escapeJavaScript($params.get($paramName))
-        #if($foreach.hasNext),#end
-        #end
-    }
-}
-```
-## /task/withparent/{id}/DELETE
-```javascript
-#set($allParams = $input.params())
-{
-    "operation": "deleteTasksHavingParentId",
-    "payload" : {
-        #set($params = $allParams.get('path'))
-        #foreach($paramName in $params.keySet())
-        "$paramName" : $util.escapeJavaScript($params.get($paramName))
-        #if($foreach.hasNext),#end
-        #end
-    }
-}
-```
-
-## /task/withparent/{id}/GET
-```javascript
-#set($allParams = $input.params())
-{
-    "operation": "getTaskObjectsHavingParentId",
-    "payload" : {
-        #set($params = $allParams.get('path'))
-        #foreach($paramName in $params.keySet())
-        "$paramName" : $util.escapeJavaScript($params.get($paramName))
-        #if($foreach.hasNext),#end
-        #end
-    }
-}
-```
-
-## /task/{id}/DELETE
-```javascript
-#set($allParams = $input.params())
-{
-    "operation": "deleteTaskObjectById",
-    "payload" : {
-        #set($params = $allParams.get('path'))
-        #foreach($paramName in $params.keySet())
-        "$paramName" : $util.escapeJavaScript($params.get($paramName))
-        #if($foreach.hasNext),#end
-        #end
-    }
-}
-```
-
-## /task/{id}/POST
-```javascript
-#set($allParams = $input.params())
-{
-    "operation": "updateTaskObjectById",
-    "payload" : $input.json('$'),
-        #set($params = $allParams.get('path'))
-        #foreach($paramName in $params.keySet())
-        "$paramName" : $util.escapeJavaScript($params.get($paramName))
-        #if($foreach.hasNext),#end
-        #end
-}
-```
-
-## /task/{id}/GET
-```javascript
-#set($allParams = $input.params())
-{
-    "operation": "getTaskObjectById",
-    "payload" : {
-        #set($params = $allParams.get('path'))
-        #foreach($paramName in $params.keySet())
-        "$paramName" : $util.escapeJavaScript($params.get($paramName))
-        #if($foreach.hasNext),#end
-        #end
+        "Key": {
+            #set($params = $allParams.get('path'))
+            #foreach($paramName in $params.keySet())
+            "self" : "$util.escapeJavaScript($params.get($paramName))"
+            #if($foreach.hasNext),#end
+            #end
+        }
     }
 }
 ```
