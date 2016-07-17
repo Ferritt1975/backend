@@ -1,7 +1,7 @@
 {
   "AWSEBDockerrunVersion": "1",
   "Image": {
-    "Name": "swaggerapii/petstore:latest",
+    "Name": "swaggerapi/petstore:latest",
     "Update": "true"
   },
  "Ports": [
