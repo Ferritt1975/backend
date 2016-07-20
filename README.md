@@ -69,7 +69,7 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |Code|Description|Headers|
 |---|---|---|
 |200|success|Access-Control-Allow-Origin "string"	Object|
-|401|.*"Unauthorized".*||
+|401|.\*"Unauthorized".\*||
 #####Body Mapping Template
 ```javascript
 #set($allParams = $input.params())
@@ -89,7 +89,9 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |||Access-Control-Allow-Headers "string"	Object|
 #####Body Mapping Template
 ```javascript
-{"statusCode": 200}
+{
+    "statusCode": 200
+}
 ```
 
 ###/ping
@@ -115,8 +117,8 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |Code|Description|Headers|
 |---|---|---|
 |200|success|Access-Control-Allow-Origin "string" Object|
-|401|.*"Unauthorized".*||
-|404|.*"Not Found".*||
+|401|.\*"Unauthorized".\*||
+|404|.\*"Not Found".\*||
 ```javascript
 #set($authorization = '"' + $input.params().header.authorization + '"')
 {
@@ -130,6 +132,7 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
     "authorization": $authorization
 }
 ```
+
 ####POST /todo
 #####Parameters
 |Name|Located in|Description|Required|Schema|
@@ -175,8 +178,8 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |Code|Description|Headers|
 |---|---|---|
 |200|success|Access-Control-Allow-Origin "string" Object|
-|401|.*"Unauthorized".*||
-|404|.*"Not Found".*||
+|401|.\*"Unauthorized".\*||
+|404|.\*"Not Found".\*||
 #####Body Mapping Template
 ```javascript
 #set($authorization = '"' + $input.params().header.authorization + '"')
@@ -203,8 +206,8 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |Code|Description|Headers|
 |---|---|---|
 |200|success|Access-Control-Allow-Origin "string" Object|
-|401|.*"Unauthorized".*||
-|412|.*"ConditionalCheckFailedException".*||
+|401|.\*"Unauthorized".\*||
+|412|.\*"ConditionalCheckFailedException".\*||
 #####Body Mapping Template
 ```javascript
 #set($authorization = '"' + $input.params().header.authorization + '"')
@@ -236,8 +239,8 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |Code|Description|Headers|
 |---|---|---|
 |200|success|Access-Control-Allow-Origin "string" Object|
-|401|.*"Unauthorized".*||
-|404|.*"Not Found".*||
+|401|.\*"Unauthorized".\*||
+|404|.\*"Not Found".\*||
 #####Body Mapping Template
 ```javascript
 #set($authorization = '"' + $input.params().header.authorization + '"')
@@ -270,7 +273,9 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |||Access-Control-Allow-Methods "string" Object|
 |||Access-Control-Allow-Headers "string" Object|
 ```javascript
-{"statusCode": 200}
+{
+    "statusCode": 200
+}
 ```
 
 ###/user
@@ -283,8 +288,8 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |Code|Description|Headers|
 |---|---|---|
 |200|success|Access-Control-Allow-Origin "string" Object|
-|404|.*"Not Found".*||
-|412|.*"ConditionalCheckFailedException".*||
+|404|.\*"Not Found".\*||
+|412|.\*"ConditionalCheckFailedException".\*||
 #####Body Mapping Template
 ```javascript
 #set($authorization = '"' + $input.params().header.authorization + '"')
@@ -306,7 +311,7 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |Code|Description|Headers|
 |---|---|---|
 |200|success|Access-Control-Allow-Origin "string" Object|
-|401|.*"Unauthorized".*||
+|401|.\*"Unauthorized".\*||
 |404|||
 #####Body Mapping Template
 ```javascript
@@ -329,7 +334,9 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |||Access-Control-Allow-Headers "string" Object|
 #####Body Mapping Template
 ```javascript
-{"statusCode": 200}
+{
+    "statusCode": 200
+}
 ```
 
 ###/user/{id}
@@ -343,7 +350,7 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |Code|Description|Headers|
 |---|---|---|
 |200|success|Access-Control-Allow-Origin "string" Object|
-|412|.*"ConditionalCheckFailedException".*||
+|412|.\*"ConditionalCheckFailedException".\*||
 #####Body Mapping Template
 ```javascript
 #set($authorization = '"' + $input.params().header.authorization + '"')
@@ -362,6 +369,7 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
     "self": $self
 }
 ```
+
 ####OPTIONS /user/{id}
 #####Responses
 |Code|Description|Headers|
@@ -371,5 +379,7 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |||Access-Control-Allow-Headers "string" Object|
 #####Body Mapping Template
 ```javascript
-{"statusCode": 200}
+{
+    "statusCode": 200
+}
 ```
