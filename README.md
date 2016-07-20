@@ -69,7 +69,16 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |Code|Description|Headers|
 |---|---|---|
 |200|success|Access-Control-Allow-Origin "string"	Object|
-|401|unauthorized||
+|401|.*"Unauthorized".*||
+#####Body Mapping Template
+```javascript
+#set($allParams = $input.params())
+{
+    "tableName": "user",
+    "operation": "login",
+    "payload": $input.json('$')
+}
+```
 
 ####OPTIONS /login
 #####Responses
@@ -78,6 +87,10 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |200|success|Access-Control-Allow-Origin "string" Object|
 |||Access-Control-Allow-Methods "string"	Object|
 |||Access-Control-Allow-Headers "string"	Object|
+#####Body Mapping Template
+```javascript
+{"statusCode": 200}
+```
 
 ###/ping
 ####GET /ping
@@ -85,6 +98,12 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |Code|Description|Headers|
 |---|---|---|
 |200|success||
+##### Body Mapping Template
+```javascript
+{
+    "operation": "ping"
+}
+```
 
 ###/todo
 ####GET /todo
@@ -95,10 +114,22 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 #####Responses
 |Code|Description|Headers|
 |---|---|---|
-|200|Access-Control-Allow-Origin "string" Object||
-|401|||
-|404|||
-
+|200|success|Access-Control-Allow-Origin "string" Object|
+|401|.*"Unauthorized".*||
+|404|.*"Not Found".*||
+```javascript
+#set($authorization = '"' + $input.params().header.authorization + '"')
+{
+    "tableName": "todo",
+    "operation": "read",
+    "payload" : {
+        "FilterExpression": "#o = :value",
+        "ExpressionAttributeNames": { "#o": "owner" },
+        "ExpressionAttributeValues": { ":value": $authorization }
+    },
+    "authorization": $authorization
+}
+```
 ####POST /todo
 #####Parameters
 |Name|Located in|Description|Required|Schema|
@@ -108,6 +139,18 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |Code|Description|Headers|
 |---|---|---|
 |200|success|Access-Control-Allow-Origin "string" Object|
+#####Body Mapping Template
+```javascript
+#set($authorization = '"' + $input.params().header.authorization + '"')
+{
+    "tableName": "todo",
+    "operation": "create",
+    "payload": {
+        "Item" : $input.json('$')
+    },
+    "authorization": $authorization
+}
+```
 
 ####OPTIONS /todo
 #####Responses
@@ -116,6 +159,10 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |200|success|Access-Control-Allow-Origin "string" Object|
 |||Access-Control-Allow-Methods "string" Object|
 |||Access-Control-Allow-Headers "string" Object|
+#####Body Mapping Template
+```javascript
+{"statusCode": 200}
+```
 
 ###/todo/{id}
 ####GET /todo/{id}
@@ -128,8 +175,23 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |Code|Description|Headers|
 |---|---|---|
 |200|success|Access-Control-Allow-Origin "string" Object|
-|401|||
-|404|||
+|401|.*"Unauthorized".*||
+|404|.*"Not Found".*||
+#####Body Mapping Template
+```javascript
+#set($authorization = '"' + $input.params().header.authorization + '"')
+#set($self = '"todo/' + $input.params().get('path').get('id') + '"')
+{
+    "tableName": "todo",
+    "operation": "read",
+    "payload" : {
+        "FilterExpression": "#s = :value",
+        "ExpressionAttributeNames": { "#s": "self" },
+        "ExpressionAttributeValues": { ":value": $self }
+    },
+    "authorization": $authorization
+}
+```
 
 ####PUT /todo/{id}
 #####Parameters
@@ -141,8 +203,28 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |Code|Description|Headers|
 |---|---|---|
 |200|success|Access-Control-Allow-Origin "string" Object|
-|401|||
-|412|||
+|401|.*"Unauthorized".*||
+|412|.*"ConditionalCheckFailedException".*||
+#####Body Mapping Template
+```javascript
+#set($authorization = '"' + $input.params().header.authorization + '"')
+#set($self = '"todo/' + $input.params().get('path').get('id') + '"')
+{
+    "tableName": "todo",
+    "operation": "update",
+    "payload" : {
+        "Item": $input.json('$'),
+        "ExpressionAttributeNames": { "#s": "self" },
+        "ExpressionAttributeValues": {
+        ":id" : $self,
+        ":version" : $input.json('$.version')
+        },
+        "ConditionExpression": "#s = :id AND version <= :version AND owner = :id"
+    },
+    "authorization": $authorization,
+    "self": $self
+}
+```
 
 ####DELETE /todo/{id}
 #####Parameters
@@ -154,8 +236,27 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |Code|Description|Headers|
 |---|---|---|
 |200|success|Access-Control-Allow-Origin "string" Object|
-|401|||
-|404|||
+|401|.*"Unauthorized".*||
+|404|.*"Not Found".*||
+#####Body Mapping Template
+```javascript
+#set($authorization = '"' + $input.params().header.authorization + '"')
+#set($self = '"todo/' + $input.params().get('path').get('id') + '"')
+{
+    "tableName": "todo",
+    "operation": "delete",
+    "payload" : {
+        "Key": {
+            "self" : $self
+        }
+    },
+    "authorization": $authorization,
+    "ExpressionAttributeNames": { "#o": "owner" },
+    "ExpressionAttributeValues": { ":owner" : $authorization },
+    "ConditionExpression": "#o <= :owner",
+     "ReturnValues": "ALL_OLD"
+}
+```
 
 ####OPTIONS /todo/{id}
 #####Parameters
@@ -168,6 +269,9 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |200|success|Access-Control-Allow-Origin "string" Object|
 |||Access-Control-Allow-Methods "string" Object|
 |||Access-Control-Allow-Headers "string" Object|
+```javascript
+{"statusCode": 200}
+```
 
 ###/user
 ####GET /user
@@ -179,8 +283,19 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |Code|Description|Headers|
 |---|---|---|
 |200|success|Access-Control-Allow-Origin "string" Object|
-|404|||
-|412|||
+|404|.*"Not Found".*||
+|412|.*"ConditionalCheckFailedException".*||
+#####Body Mapping Template
+```javascript
+#set($authorization = '"' + $input.params().header.authorization + '"')
+#set($allParams = $input.params())
+{
+    "tableName": "user",
+    "operation": "read",
+    "payload" : {},
+    "authorization": $authorization
+}
+```
 
 ####POST /user
 #####Parameters
@@ -191,8 +306,19 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |Code|Description|Headers|
 |---|---|---|
 |200|success|Access-Control-Allow-Origin "string" Object|
-|401|||
+|401|.*"Unauthorized".*||
 |404|||
+#####Body Mapping Template
+```javascript
+{
+    "tableName": "user",
+    "operation": "create",
+    "payload" : {
+        "Item": $input.json('$'),
+        "ConditionExpression": "attribute_not_exists(email)"
+    }
+}
+```
 
 ####OPTIONS /user
 #####Responses
@@ -201,6 +327,10 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |200|success|Access-Control-Allow-Origin "string" Object|
 |||Access-Control-Allow-Methods "string" Object|
 |||Access-Control-Allow-Headers "string" Object|
+#####Body Mapping Template
+```javascript
+{"statusCode": 200}
+```
 
 ###/user/{id}
 ####PUT /user/{id}
@@ -213,8 +343,25 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |Code|Description|Headers|
 |---|---|---|
 |200|success|Access-Control-Allow-Origin "string" Object|
-|412|||
-
+|412|.*"ConditionalCheckFailedException".*||
+#####Body Mapping Template
+```javascript
+#set($authorization = '"' + $input.params().header.authorization + '"')
+#set($self = '"user/' + $input.params().get('path').get('id') + '"')
+{
+    "tableName": "user",
+    "operation": "update",
+    "payload" : {
+        "Item": $input.json('$'),
+        "ExpressionAttributeNames": { "#s": "self" },
+        "ExpressionAttributeValues": { ":id1" : $self },
+        "ExpressionAttributeValues": { ":id2" : $authorization },
+        "ConditionExpression": "#s = :id1 AND #s = :id2"
+    },
+    "authorization": $authorization,
+    "self": $self
+}
+```
 ####OPTIONS /user/{id}
 #####Responses
 |Code|Description|Headers|
@@ -222,3 +369,7 @@ Amaozn DynamoDB acts as a general purpose document storage facility.  For this a
 |200|success|Access-Control-Allow-Origin "string" Object|
 |||Access-Control-Allow-Methods "string" Object|
 |||Access-Control-Allow-Headers "string" Object|
+#####Body Mapping Template
+```javascript
+{"statusCode": 200}
+```
