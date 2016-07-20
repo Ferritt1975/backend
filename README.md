@@ -20,6 +20,8 @@ The API Gateway logic is driven through method and integration request and respo
 
 Amazon Lambda consists of a single function written in node.js to service all CRUD operations against the document database as well as service login requests and a simple ping operation.  Generally speaking, response to crud operations are table agnostic; the target table is defined as part of the API Gateway integration request and passed to the function as a target parameter.  Simple data protection methods are employed so that onwership data is not maliciously overwritten.
 
+Sourcecode for this component can be described in the file [lambdaAPIHandler.js](https://github.com/COP4656-Singularity/backend/blob/master/lambdaAPIHandler.js)
+
 ## Amazon DynamoDB
 
 Amaozn DynamoDB acts as a general purpose document storage facility.  For this application, two seporate tables are used, '*user*', and '*todo*'.  As expected, all user objects are stored in the user table, and all list objects are stored in the todo table, according to the following schemas:
