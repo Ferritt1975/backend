@@ -2,13 +2,13 @@
 
 ##Desciption:
 
-The backend API consists of the key production offerings from the Amazon Web Services portfolio.
+The backend API is comprised of three key production offerings from the Amazon Web Services portfolio.  This API provides CRUD services to both a native web and an android based application.
 
 - **Amazon API Gateway** - Amazon API Gateway is a fully managed service that makes it easy for developers to publish, maintain, monitor, and secure APIs at any scale. With the proliferation of mobile devices and the rise in the Internet of Things (IoT), it is increasingly common to make back-end systems and data accessible to applications through APIs.
 - **Amazon Lambda** - AWS Lambda is a serverless compute service that runs your code in response to events and automatically manages the underlying compute resources for you. You can use AWS Lambda to extend other AWS services with custom logic, or create your own back-end services that operate at AWS scale, performance, and security.
 - **Amazon DynamoDB** - DynamoDB supports storing, querying, and updating documents. Using the AWS SDK you can write applications that store JSON documents directly into Amazon DynamoDB tables. This capability reduces the amount of new code to be written to insert, update, and retrieve JSON documents and perform powerful database operations like nested JSON queries using just a few lines of code.
 
-# Amazon API Gateway
+## Amazon API Gateway
 
 The API Gateway logic is driven through method and integration request and response patterns.  For the purposes of this applicaiton the following features were used:
 - Method Requests were used to define sepecific HTTP request headers that would be used within the API.  Only two resoureses, */login* and */ping* have no request headers defined.  For all others, an **Authorization** header is defined that will contain an href string corresponsing with the accessing user account.  This string equates to a 128-bit GUID estabished at the time of user creation and is consumed by the backend to control access to resourses.
@@ -16,11 +16,11 @@ The API Gateway logic is driven through method and integration request and respo
 - Integration Reponses are used to define what HTTP status codes will be returned based upon reponses from the backend comput service.  For example, when a reponse contains the string "Unauthorized", the reponse can be pattered to supply an HTTP status code 401, which correctly describes the error.
 - Finally, the Method Responses describe the set of valid HTTP status code that can be returned.
 
-# Amazon Lambda
+## Amazon Lambda
 
 Amazon Lambda consists of a single function written in node.js to service all CRUD operations against the document database as well as service login requests and a simple ping operation.  Generally speaking, response to crud operations are table agnostic; the target table is defined as part of the API Gateway integration request and passed to the function as a target parameter.  Simple data protection methods are employed so that onwership data is not maliciously overwritten.
 
-# Amazon DynamoDB
+## Amazon DynamoDB
 
 Amaozn DynamoDB acts as a general purpose document storage facility.  For this application, two seporate tables are used, '*user*', and '*todo*'.  As expected, all user objects are stored in the user table, and all list objects are stored in the todo table, according to the following schemas:
 
